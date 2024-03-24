@@ -1,0 +1,35 @@
+#include <Wire.h>
+#include <Adafruit_Sensor.h>
+#include <Adafruit_ADXL345_U.h>
+
+Adafruit_ADXL345_Unified accel = Adafruit_ADXL345_Unified(12345);
+
+void setup(void) {
+  Serial.begin(9600);
+  if(!accel.begin()) {
+    Serial.println("Ooops, no ADXL345 detected ... Check your wiring!");
+    while(1);
+  }
+  accel.setRange(ADXL345_RANGE_16_G);
+}
+
+void loop(void) {
+  sensors_event_t event; 
+  accel.getEvent(&event);
+  
+  // Calculate total acceleration vector
+  float acceleration = sqrt(event.acceleration.x * event.acceleration.x +
+                             event.acceleration.y * event.acceleration.y +
+                             event.acceleration.z * event.acceleration.z);
+  
+  // Check if acceleration is below a certain threshold (indicating no movement)
+  if (acceleration < 1.0) {
+    Serial.println("Sleeping...");
+    // Add your sleep monitoring logic here
+  } else {
+    Serial.println("Awake!");
+    // Add your awake monitoring logic here
+  }
+  
+  delay(500); // Delay to control the sampling rate
+}
